@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quarkus
+  labels:
+    app: quarkus
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: quarkus
+    tier: frontend
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: quarkus
+  labels:
+    app: quarkus
+spec:
+  selector:
+    matchLabels:
+      app: quarkus
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: quarkus
+        tier: frontend
+    spec:
+      containers:
+      - image: ffzs/quarkus_demo:v1
+        name: quarkus
+        imagePullPolicy: Always
+        env:
+        - name: POSTGRE_HOST
+          value: 'quarkus-postgre'
+        ports:
+        - containerPort: 8080
+          name: quarkus
+      initContainers:
+      - name: init-database
+        image: busybox
+        command: ['sh', '-c', 'until nslookup quarkus-postgre; do echo waiting for quarkus-postgre; sleep 2; done;']
+

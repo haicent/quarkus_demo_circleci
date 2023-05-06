@@ -1,0 +1,8 @@
+secretGenerator:
+    - name: postgre-pass
+      literals:
+      - password=123zxc
+
+resources:
+    - postgre-deployment.yml
+    - quarkusApp-deployment.yml
